@@ -1,11 +1,11 @@
 # Site settings
-title: Andrej Karpathy blog
+title: Jianchao Li blog
 email: 
-description: "Musings of a Computer Scientist."
+description: "I love writing deep learning codes for computer vision."
 baseurl: ""
-url: "http://karpathy.github.io"
-twitter_username: karpathy
-github_username:  karpathy
+url: "http://jianchao-li.github.io"
+twitter_username: jianchao2017
+github_username:  jianchao-li
 
 # Build settings
 markdown: kramdown

@@ -1,4 +1,3 @@
-# My blog
+# Jianchao's Blog
 
-This is my blog, uses [Jekyll](http://jekyllrb.com/). I was tired of bloated, slow Wordpress that locked up all my content.
-
+This is the repository for [my blog](https://jianchao-li.github.io).
