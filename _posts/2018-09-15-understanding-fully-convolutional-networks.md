@@ -533,6 +533,55 @@ def compose_fp_list(fp_list):
     return fp_out
 ````
 
-## More to come
+## Finer Details
 
-I will further cover [voc-fcn16s](https://github.com/shelhamer/fcn.berkeleyvision.org/blob/master/voc-fcn16s/val.prototxt) and [voc-fcn8s](https://github.com/shelhamer/fcn.berkeleyvision.org/blob/master/voc-fcn8s/val.prototxt). Please stay tuned :)
+In the `upscore` layer of voc-fcn32s, the feature maps are directly upsampled by a large factor of 32 (this is why it is named voc-fcn32s), which will produce relatively coarse predictions due to missing finer detils from intermediate resolutions. So, in [voc-fcn16s](https://github.com/shelhamer/fcn.berkeleyvision.org/blob/master/voc-fcn16s/val.prototxt) and [voc-fcn8s](https://github.com/shelhamer/fcn.berkeleyvision.org/blob/master/voc-fcn8s/val.prototxt), the shrinked feature maps are upsampled more than once before being recovered to the size of the image.
+
+For [voc-fcn16s](https://github.com/shelhamer/fcn.berkeleyvision.org/blob/master/voc-fcn16s/val.prototxt), the feature maps from `score_fr` will first be upsampled by a factor of 2 in `upscore2`. Then, we generate another set of outputs from `pool4` using convolution in `score_pool4` and crop it to be the same size as that of `upscore2` in `score_pool4c`. Finally, we combine `upscore2` and `score_pool4c` using element-wise summation in `fuse_pool4`, upsample it by a factor of 16 in `upscore16` and crop it in `score` to obtain the output. We show the network architecture for this process while omitting the previous layers in the following figure. Moreover, this process is broken down in the table below.
+
+<div style="text-align:center"><img src="/assets/fcn-voc16s.png" width="100%"/></div>
+
+| Name | Type | Params | Size |
+| ---- | ---- | ------ | ----:|
+| `pool4` | Pooling | max 2x2, stride 2 | $512 \times \left(\frac{H + 6}{16} + 12\right) \times \left(\frac{W + 6}{16} + 12\right)$ |
+| `score_pool4` | Convolution | 21 1x1 kernels | $21 \times \left(\frac{H + 6}{16} + 12\right) \times \left(\frac{W + 6}{16} + 12\right)$ |
+| `score_fr` | Convolution | 21 1x1 kernels | $21 \times \frac{H + 6}{32} \times \frac{W + 6}{32}$ |
+| `upscore2` | Deconvolution | 21 4x4 kernels, stride 2 | $21 \times \left(\frac{H + 6}{16} + 2\right) \times \left(\frac{W + 6}{16} + 2\right)$ |
+| `score_pool4c` | Crop | axis 2, offset 5 | $21 \times \left(\frac{H + 6}{16} + 2\right) \times \left(\frac{W + 6}{16} + 2\right)$|
+| `fuse_pool4` | Eltwise | sum | $21 \times \left(\frac{H + 6}{16} + 2\right) \times \left(\frac{W + 6}{16} + 2\right)$ | 
+| `upscore16` |  Deconvolution | 21 32x32 kernels, stride 16 | $21 \times \left(H + 54\right) \times \left(W + 54\right)$ |
+| `score` | Crop | axis 2, offset 27 | $21 \times H \times W$|
+
+As can be seen, the finer details from the intermediate resolution in `pool4` are incorporated into later feature maps, which will produce finer outputs than those of fcn-voc32s. Actually, fcn-voc16s utilizes two resolutions of a factor of 16 and a factor of 32.
+
+We may combine more resolutions in the same way. In fcn-voc8s, we generate one more set of outputs from `pool3` and combine it with later feature maps. The network architecture is similarly shown in the figure below with the process broken down in the following table.
+
+<div style="text-align:center"><img src="/assets/fcn-voc8s.png" width="100%"/></div>
+
+| Name | Type | Params | Size |
+| ---- | ---- | ------ | ----:|
+| `pool3` | Pooling | max 2x2, stride 2 | $256 \times \left(\frac{H + 6}{8} + 24\right) \times \left(\frac{W + 6}{8} + 24\right)$ |
+| `score_pool3` | Convolution | 21 1x1 kernels | $21 \times \left(\frac{H + 6}{8} + 24\right) \times \left(\frac{W + 6}{8} + 24\right)$ |
+| `pool4` | Pooling | max 2x2, stride 2 | $512 \times \left(\frac{H + 6}{16} + 12\right) \times \left(\frac{W + 6}{16} + 12\right)$ |
+| `score_pool4` | Convolution | 21 1x1 kernels | $21 \times \left(\frac{H + 6}{16} + 12\right) \times \left(\frac{W + 6}{16} + 12\right)$ |
+| `score_fr` | Convolution | 21 1x1 kernels | $21 \times \frac{H + 6}{32} \times \frac{W + 6}{32}$ |
+| `upscore2` | Deconvolution | 21 4x4 kernels, stride 2 | $21 \times \left(\frac{H + 6}{16} + 2\right) \times \left(\frac{W + 6}{16} + 2\right)$ |
+| `score_pool4c` | Crop | axis 2, offset 5 | $21 \times \left(\frac{H + 6}{16} + 2\right) \times \left(\frac{W + 6}{16} + 2\right)$|
+| `fuse_pool4` | Eltwise | sum | $21 \times \left(\frac{H + 6}{16} + 2\right) \times \left(\frac{W + 6}{16} + 2\right)$ | 
+| `upscore_pool4` |  Deconvolution | 21 4x4 kernels, stride 2 | $21 \times \left(\frac{H + 6}{8} + 6\right) \times \left(\frac{W + 6}{8} + 6\right)$ |
+| `score_pool3c` | Crop | axis 2, offset 9 | $21 \times \left(\frac{H + 6}{8} + 6\right) \times \left(\frac{W + 6}{8} + 6\right)$ |
+| `fuse_pool3` | Eltwise | sum | $21 \times \left(\frac{H + 6}{8} + 6\right) \times \left(\frac{W + 6}{8} + 6\right)$ |
+| `upscore8` | Deconvolution | 21 16x16 kernels, stride 8 | $21 \times \left(H + 62\right) \times \left(W + 62\right)$ |
+| `score` | Crop | axis 2, offset 31 | $21 \times H \times W$|
+
+In fcn-voc8s, one more intermediate resolution `pool3` are incorpoeated. From fcn-voc32s, fcn-voc16s to fcn-voc8s, more intermediate resolutions are incorporated and the results will contain more details, as shown below (taken from the [FCN paper](https://arxiv.org/pdf/1411.4038.pdf)).
+
+<div style="text-align:center"><img src="/assets/details.png"/></div>
+
+## Conclusion
+We cover fully convolutional networks in great detail. To summarize, we have learend:
+* Semantic segmentation requires dense pixel-level classification while image classification is only in image-level. 
+* Fully convolutional networks (FCNs) are a general framework to solve semantic segmentation.
+* The key to generate outputs with the same size as the input in FCNs is to use deconvolution layers, which are just convolutional layers with input and output swapped.
+* The offset parameter in the Crop layers of FCNs can be computed by breaking down the network layer by layer or using an analytic equation.
+* Outputs with higher resolutions from intermediate layers of the network can be incorporated to enhance the details in the segmentation results.
