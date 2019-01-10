@@ -2,17 +2,65 @@
 layout: default
 ---
 
-<div class="home">
-  
-  <ul class="posts">
-    {% for post in site.posts %}
-      <li>
-        <span class="post-date">{{ post.date | date: "%b %-d, %Y" }}</span>
-        <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
-        <br>
-        {{ post.excerpt }}
-      </li>
-    {% endfor %}
-  </ul>
+<div class="container">
+  <div class="row">
+    <div class="col s12 m3 l3">
+      <img id="avatar" src="assets/jianchao.jpg" />
+    </div>
+    <div class="col s12 m9 l9">
+      <h3>{{ site.title }}</h3>
+      <h4>{{ site.description }}</h4>
+      <h2>  
+        <span>
+          <a href="https://github.com/{{ site.github_username }}">
+            <i class="fab fa-github"></i>
+          </a>
+        </span>
+        <span>
+          <a href="https://linkedin.com/in/{{ site.linkedin_username }}">
+            <i class="fab fa-linkedin"></i>
+          </a>
+        </span>
+        <span>
+          <a href="https://facebook.com/{{ site.facebook_username }}">
+            <i class="fab fa-facebook"></i>
+          </a>
+        </span>
+        <span>
+          <a href="https://twitter.com/{{ site.twitter_username }}">
+            <i class="fab fa-twitter"></i>
+          </a>
+        </span>
+      </h2>
+    </div>
+    <div id="bio" class="col s12">
+      <h3>Biography</h3>
+      <p>I am Jianchao Li, a software engineer specialized in computer vision. I received my bachelor's degree from the <a href="http://www.ustb.edu.cn/">University of Science and Technology Beijing</a> (USTB) in 2013 and my master's degree from the <a href="http://www.ucas.edu.cn/">University of Chinese Academy of Sciences</a> (UCAS) in 2016. During my master study, I worked in the <a href="http://vipl.ict.ac.cn/">Visual Information Processing and Learning</a> (VIPL) group at the <a href="http://www.ict.ac.cn/">Institute of Computing Technology, Chinese Academy of Sciences</a> (ICT, CAS) with Professor <a href="http://scholar.google.com/citations?user=Vkzd7MIAAAAJ&hl=en">Shiguang Shan</a>, on <b>applying deep learning to computer vision</b> and completed two projects for the <a href="http://research.baidu.com/institute-of-deep-learning/">Baidu Institute of Deep Learning</a>.</p>
 
+      After graduation, I joined <a href="https://www.indeed.com">Indeed</a> - the world's #1 job site as a software engineer in October 2016 and transitioned to a site reliability engineer in October 2017. After spending 17 wonderful months there, I came back to China in February 2018. I first spent about half a year at <a href="http://jeejio.com/en">Jeejio</a>, a start-up in Beijing, leading its algorithm team. Later I joined the <a href="http://ailab.bytedance.com/">ByteDance AI Lab</a> and spent another 6 months there, working on computer vision and advertising.
+    </div>
+    <div id="time" class="col s12">
+      <h3>Timeline</h3>
+      <span class="when">Sept. 2018 - Mar. 2019</span> <span class="what"">Algorithm Engineer at ByteDance AI Lab</span> Computer vision<br/>
+      <span class="when">Febr. 2018 - Aug. 2018</span> <span class="what"">Founding Member, Head of Algorithms at Jeejio</span> Neural network compression<br/>
+      <span class="when">Oct. 2017 - Febr. 2018</span> <span class="what"">Site Reliability Engineer at Indeed</span> Log analysis<br/>
+      <span class="when"">Oct. 2016 - Oct. 2017</span> <span class="what"">Software Engineer at Indeed</span> Full-stack web development<br/>
+      <span class="when"">Jul. 2014 - Sept. 2015</span> <span class="what"">Baidu Institute of Deep Learning Research Stdudent</span> Clothing segmentation and classification.<br/>
+      <span class="when"">Sep. 2013 - Jun. 2016</span> <span class="what"">UCAS Computer Science Master stdudent</span> Adviser: Shiguang Shan. Thesis: <a href="http://d.wanfangdata.com.cn/Thesis/Y3152987">Research on Applications of Deep Neural Networks on Object Segmentation and Image Classification</a><br/>
+      <span class="when"">Aug. 2012</span> <span class="what"">Tsinghua University Summer Intern Student</span> Adviser: <a href="http://3dimage.ee.tsinghua.edu.cn/mhm">Huimin Ma</a>. Identification of aircrafts under smog in infrared images using morphological algorithms<br/>
+      <span class="when"">Sept. 2009 - Jun. 2013</span> <span class="what"">USTB Communication Engineering Undergraduate Student</span> Thesis: Research and Development of Region-Of-Non-Interest Detection Techniques in Videos
+    </div>
+    <div id="blog" class="col s12">
+      <h3>Blogs</h3>
+      {% for post in site.posts %}
+      <div class="card">
+        <div class="card-content">
+          <p>{{ post.date | date: "%b %-d, %Y" }}</p>
+          <a href="{{ post.url | prepend: site.baseurl }}"><span class="card-title">{{ post.title }}</span></a>
+          <p>{{ post.excerpt }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
 </div>

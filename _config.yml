@@ -1,11 +1,14 @@
 # Site settings
-title: Jianchao Li blog
+title: Jianchao Li
 email: 
 description: "I love writing deep learning codes for computer vision."
 baseurl: ""
 url: "http://jianchao-li.github.io"
-twitter_username: jianchao2017
 github_username:  jianchao-li
+linkedin_username: jianchao-li
+twitter_username: jianchao2017
+facebook_username: jianchao.li.fighter
+
 
 # Build settings
 markdown: kramdown
